@@ -1,0 +1,36 @@
+  roi:
+    topic_name: rough/rois
+    db_1: 
+      x_offset: 600  #leftmost of the ROI 
+      y_offset: 50  #topmost of the ROI 
+      width:  600  #width of the ROI  
+      height: 600  #height of the ROI 
+    db_2: 
+      x_offset: 500  
+      y_offset: 150  
+      width:  200  
+      height: 200  
+    db_3: 
+      x_offset: 450  
+      y_offset: 190  
+      width:  100  
+      height: 100  
+    jp_1: 
+      x_offset: 700  
+      y_offset: 90  
+      width:  200  
+      height: 200  
+    jp_2: 
+      x_offset: 590  
+      y_offset: 220  
+      width:  50  
+      height: 50  
+    jp_3: 
+      x_offset: 600  
+      y_offset: 120  
+      width:  100  
+      height: 100  
+
+  image_topic_name: image/raw
+  looprate: 24
+
