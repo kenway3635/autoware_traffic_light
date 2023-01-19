@@ -6,34 +6,30 @@ class MinimalSubscriber : public rclcpp::Node
   public:
     MinimalSubscriber(): Node("minimal_subscriber")
     {
-      subscription_ = this->create_subscription<std_msgs::msg::String>("topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
+      //publisher
+      //roi_area_pub= this->create_publisher<std_msgs::msg::Float32>("roi_percent",10);
+
+      //subscriber
       rough_roi_sub = this->create_subscription<autoware_auto_perception_msgs::msg::TrafficLightRoiArray>("rough/rois", 10, std::bind(&MinimalSubscriber::rough_roi_callback, this, _1));
       roi_sub = this->create_subscription<autoware_auto_perception_msgs::msg::TrafficLightRoiArray>("rois", 10, std::bind(&MinimalSubscriber::roi_callback, this, _1));
+
+      //timer
+      timer_ = this->create_wall_timer(500ms,std::bind(&MinimalSubscriber::timer_callback, this));
     }
-    double get_roi_info()
-    {
-      return calculate_roi_size(rough_roi,roi);
-    }
+    double get_roi_info() { return calculate_roi_size(rough_roi,roi); }
 
 
 
   private:
-    void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
-    {
-      RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
-    }
-    void rough_roi_callback(const autoware_auto_perception_msgs::msg::TrafficLightRoiArray::SharedPtr msg)
-    {
-      rough_roi = msg->rois[0];
-    }
-    void roi_callback(const autoware_auto_perception_msgs::msg::TrafficLightRoiArray::SharedPtr msg)
-    {
-      roi = msg->rois[0];
-    }
 
-    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
+    void rough_roi_callback(const autoware_auto_perception_msgs::msg::TrafficLightRoiArray::SharedPtr msg)  { rough_roi = msg->rois[0]; }
+    void roi_callback(const autoware_auto_perception_msgs::msg::TrafficLightRoiArray::SharedPtr msg)  { roi = msg->rois[0]; }
+    void timer_callback();
+
+
     rclcpp::Subscription<autoware_auto_perception_msgs::msg::TrafficLightRoiArray>::SharedPtr rough_roi_sub;
     rclcpp::Subscription<autoware_auto_perception_msgs::msg::TrafficLightRoiArray>::SharedPtr roi_sub;
+    rclcpp::TimerBase::SharedPtr timer_;
 
     TrafficLightRoi rough_roi;
     TrafficLightRoi roi;
@@ -42,11 +38,20 @@ class MinimalSubscriber : public rclcpp::Node
     autoware_auto_perception_msgs::msg::TrafficLight signal;
 };
 
+
+void MinimalSubscriber::timer_callback()
+{
+  double roi_percent = this->get_roi_info();
+  std::cout<<"rough ROI percent is  "<<roi_percent<<"%"<<std::endl;
+}
 double MinimalSubscriber::calculate_roi_size(const TrafficLightRoi a ,const TrafficLightRoi b)
 {
   uint32_t rough_area = a.roi.height * a.roi.width;
+  std::cout<<"rough area is " << rough_area << std::endl;
   uint32_t area = b.roi.height * b.roi.width;
-  double area_percent = (rough_area-area)/area;
+  std::cout<<"area is "<<area<<std::endl;
+  
+  double area_percent = (rough_area-area)/area*100;
 
   return area_percent;
 };
