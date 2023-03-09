@@ -6,6 +6,7 @@ void rosnode::timer_callback()
   double roi_percent = this->get_roi_info();
   std::cout<<"rough ROI percent is  "<<roi_percent<<"%"<<std::endl;
 }
+
 double rosnode::calculate_roi_size(const ROI a ,const ROI b)
 {
   uint32_t rough_area = a.roi.height * a.roi.width;
